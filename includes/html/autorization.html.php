@@ -1,4 +1,4 @@
-<?php include_once 'header.html.php';?>
+<?php include 'header.html.php';?>
 <div class="container-fluid" xmlns="http://www.w3.org/1999/html">
     <div class="jumbotron text-center" style="margin-bottom:0">
         <h1>Вход в систему</h1>
@@ -8,10 +8,10 @@
             <form action="" method="post">
                 <div class="form-group">
                     <div class="p2">
-                        <input type="text" name="username" placeholder="Имя пользователя" class="form-control" >
+                        <input type="text" name="username" placeholder="Имя пользователя" class="form-control" minlength="1">
                     </div>
                     <div class="p2">
-                        <input type="password" name="password" id="password" placeholder="Пароль" class="form-control" >
+                        <input type="password" name="password" id="password" placeholder="Пароль" class="form-control" minlength="1">
                     </div>
                     <div class="row d-flex justify-content-center">
                     <div class="p2">
@@ -21,16 +21,18 @@
                         </div>
                         <div class="p2">
                         <label class="form-check-label">
-                            <input type="checkbox" id="remember" class="form-check-input" value="" name="remember">Запомнить
+                            <input type="hidden" name="remember" value="0">
+                            <input type="checkbox" id="remember" class="form-check-input" value="1" name="remember">Запомнить
                         </label>
                     </div>
                     </div>
                     <div class="p2">
-                        <input type="submit" value="Войти" class="btn btn-success">
+                        <input type="hidden" name="csrftoken" value="<?php echo $csrfToken;?>">
+                        <input type="submit" value="Войти" class="btn btn-success" name="submit_login">
                     </div>
                 </div>
             </form>
         </div>
     </div>
 </div>
-<?php include_once 'footer.html.php';?>
+<?php include 'footer.html.php';?>
