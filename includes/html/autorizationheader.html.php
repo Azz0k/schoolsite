@@ -35,6 +35,11 @@
             .form-check-label{
                 padding: 7px;
             }
+            .errortext{
+                text-align: center;
+                font-size: small;
+                color: red;
+            }
 
         </style>
     </head>
