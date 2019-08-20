@@ -1,8 +1,0 @@
-{
-  "name": "schoolsite",
-  "version": "1.0.0",
-  "dependencies": {
-    "react-dom": "^16.9.0",
-    "uniq": "^1.0.1"
-  }
-}
