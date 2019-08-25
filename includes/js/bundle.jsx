@@ -72,7 +72,7 @@ class MenuItem extends React.Component{
 
     }
 }
-class Navbar extends React.Component{
+class MenuBar extends React.Component{
     constructor(){
         super();
         this.state = {
@@ -104,6 +104,7 @@ class Navbar extends React.Component{
         }
     }
     render(){
+
         const items = this.state.menu.map(this.MenuMap);
         return(
             <nav className="navbar navbar-expand-lg navbar-light bg-light">
@@ -119,3 +120,4 @@ class Navbar extends React.Component{
         );
     }
 }
+ReactDOM.render(<MenuBar/>, document.getElementById('menu'));

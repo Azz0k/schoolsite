@@ -54,6 +54,17 @@ class Database
 
         return $result;
     }
+    //новая функция для APi
+    public function validateUserName($username, $password, $newtoken, $oldtoken){
+      if ($oldtoken===$newtoken){
+        $pattern = '/^[\w\-\_\.]+$/'; //username can contain only letters, numbers, dots, -_
+        if (!preg_match($pattern, $username)) return false;
+        $user = $this->findUser($username);
+        if (password_verify($password, $user['password'])) return true;
+      }
+      return false;
+    }
+
     // проверяет, есть ли юзер в бд
     public function validateUserPassword($token){
         if ($token ===$_POST['csrftoken']){
@@ -65,6 +76,7 @@ class Database
         }
         return false;
     }
+
     public function storeCookie($username, $hash){
         try{
             $pdo = $this->pdo;
