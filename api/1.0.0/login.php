@@ -1,22 +1,34 @@
 <?php
 
-header("Access-Control-Allow-Origin: *");
+header("Access-Control-Allow-Origin: http://localhost:3000");
+header("Access-Control-Allow-Credentials: true");
 header("Content-Type: application/json; charset=UTF-8");
-header("Access-Control-Allow-Methods: GET, POST");
+header("Access-Control-Allow-Methods: GET, POST, OPTIONS");
 header("Access-Control-Max-Age: 3600");
-header("Access-Control-Allow-Headers: Content-Type, Access-Control-Allow-Headers, Authorization, X-Requested-With");
+header("Access-Control-Allow-Headers: Content-Type, Access-Control-Allow-Headers, Authorization, X-Requested-With, Access-Control-Allow-Credentials");
 $method = $_SERVER['REQUEST_METHOD'];
-
+if ($method==='OPTIONS'){
+  http_response_code(200);
+  die();
+}
 
 foreach (glob($_SERVER['DOCUMENT_ROOT'].'/includes/php/*.php') as $file){
   require_once $file;
 }
 
 if ($method==="GET"){
-  //$cookiehash = '321';
-  $cookiehash = getToken(250);
-  setcookie('csrf', $cookiehash, 0, '/', '', false, true);//cookie expires after browser closed
-
+  $header = getallheaders();
+  if (isset($header['Authorization']) && $header['Authorization']){
+    $jwt = $header['Authorization'];
+    //тут надо запилить проверку jwt и перевыпуск токена
+  }
+  else {
+    $cookiehash = getToken(250);
+    setcookie('csrf', $cookiehash, 0, '/', '', false, true);//cookie expires after browser closed
+    http_response_code(200);
+    echo json_encode(array("csrf" => $cookiehash));
+    die();
+  }
 }
 else {
   $data = json_decode(file_get_contents("php://input"));
