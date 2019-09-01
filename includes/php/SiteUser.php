@@ -11,7 +11,7 @@ class SiteUser
     public $desription = null;
     public $userdate = null;
     public $username = null;
-    public $cookie = null;
+    public $groups = [];
     public function __construct($user)
     {
         foreach ($user as $key=>$item) {

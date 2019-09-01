@@ -55,16 +55,56 @@ class Database
 
         return $result;
     }
-    //новая функция для APi возвращает true если совпадает два токена и в базе есть юзер с паролем
+    //новая функция для APi
     public function validateUserName($username, $password, $newtoken, $oldtoken){
       if ($oldtoken===$newtoken){
         $pattern = '/^[\w\-\_\.]+$/'; //username can contain only letters, numbers, dots, -_
         if (!preg_match($pattern, $username)) return false;
         $user = $this->findUser($username);
+        $this->currentUser = new SiteUser($user);
         if (password_verify($password, $user['password'])) return true;
       }
       return false;
     }
 
+    // проверяет, есть ли юзер в бд
+    public function validateUserPassword($token){
+        if ($token ===$_POST['csrftoken']){
+            $pattern = '/^[\w\-\_\.]+$/'; //username can contain only letters, numbers, dots, -_
+            if (!preg_match($pattern, $_POST['username'])) return false;
+            $user = $this->findUser($_POST['username']);
+            if (password_verify($_POST['password'],$user['password']))//($user['password']===$_POST['password'])
+                return true;
+        }
+        return false;
+    }
 
+    public function storeCookie($username, $hash){
+        try{
+            $pdo = $this->pdo;
+            $s = $pdo->prepare('update users set cookie=:cookie where username=:name');
+            $s->bindValue(':name', $username);
+            $s->bindValue(':cookie', $hash);
+            $s->execute();
+        }
+        catch (PDOException $e){
+            $this->error($e, "Unable to query database: ");
+            exit(0);
+        }
+    }
+    public function validateCookie($username, $hash){
+        try{
+            $pdo = $this->pdo;
+            $s = $pdo->prepare('select * from users where username=:name');
+            $s->bindValue(':name', $username);
+            $s->execute();
+            $result = $s->fetch(PDO::FETCH_ASSOC);
+        }
+        catch (PDOException $e){
+            $this->error($e, "Unable to query database: ");
+            exit(0);
+        }
+        if ($result['cookie']===$hash) return true;
+        return false;
+    }
 }

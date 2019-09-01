@@ -1,5 +1,6 @@
 <?php
 
+#header("Access-Control-Allow-Origin: http://localhost");
 header("Access-Control-Allow-Origin: http://localhost:3000");
 header("Access-Control-Allow-Credentials: true");
 header("Content-Type: application/json; charset=UTF-8");
@@ -18,11 +19,23 @@ foreach (glob($_SERVER['DOCUMENT_ROOT'].'/includes/php/*.php') as $file){
 
 if ($method==="GET"){
   $header = getallheaders();
-  if (isset($header['Authorization']) && $header['Authorization']){
-    $jwt = $header['Authorization'];
-    //тут надо запилить проверку jwt и перевыпуск токена
+  if (isset($header['Authorization']) && $header['Authorization']){ #тут надо запилить проверку jwt и перевыпуск токена
+    list($bearer,$oldJwt) = explode(' ',$header['Authorization']);
+    if ($bearer==='Bearer'){
+      $MAIN_INI_FILE = $_SERVER['DOCUMENT_ROOT'] . '/init.ini';
+      $initialValues = parse_ini_file($MAIN_INI_FILE, false, INI_SCANNER_TYPED);
+      $jwt = JWT::validate($oldJwt, $initialValues['secret']);
+      if ($jwt) {
+        http_response_code(200);
+        echo json_encode(array("message" => "Authorized","jwt"=>$jwt));
+        die();
+      }
+    }
+    http_response_code(401);
+    echo json_encode(array("message" => "Not authorized"));
+    die();
   }
-  else {
+  else {#get без хедера авторизации - получение csrf
     $cookiehash = getToken(250);
     setcookie('csrf', $cookiehash, 0, '/', '', false, true);//cookie expires after browser closed
     http_response_code(200);
@@ -30,7 +43,7 @@ if ($method==="GET"){
     die();
   }
 }
-else {
+else { #POST
   $data = json_decode(file_get_contents("php://input"));
   $MAIN_INI_FILE = $_SERVER['DOCUMENT_ROOT'] . '/init.ini';
   $initialValues = parse_ini_file($MAIN_INI_FILE, false, INI_SCANNER_TYPED);
