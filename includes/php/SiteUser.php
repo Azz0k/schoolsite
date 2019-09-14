@@ -11,7 +11,10 @@ class SiteUser
     public $desription = null;
     public $userdate = null;
     public $username = null;
-    public $groups = [];
+    public $canconfigure = null;
+    public $canchangeusers = null;
+    public $canchangemenu = null;
+    public $canchangematerials = null;
     public function __construct($user)
     {
         foreach ($user as $key=>$item) {

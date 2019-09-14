@@ -38,15 +38,21 @@ class Database
         //return $pdo;
     }
     //запрос из базы
-    public function findUser($username){
+    public function findUser($username, $all = false){
         $result = null;
         try{
-            //$result = $this->pdo->query("select  from users where username='$username'");
             $pdo = $this->pdo;
-            $s = $pdo->prepare('select * from users where username=:name');
-            $s->bindValue(':name', $username);
-            $s->execute();
-            $result = $s->fetch(PDO::FETCH_ASSOC);
+            if ($all){
+              $s = $pdo->prepare('select * from users');
+              $s->execute();
+              $result = $s->fetchAll(PDO::FETCH_ASSOC);
+            }else
+            {
+              $s = $pdo->prepare('select * from users where username=:name');
+              $s->bindValue(':name', $username);
+              $s->execute();
+              $result = $s->fetch(PDO::FETCH_ASSOC);
+            }
         }
         catch (PDOException $e){
             $this->error($e, "Unable to query database: ");
@@ -55,12 +61,14 @@ class Database
 
         return $result;
     }
+
     //новая функция для APi возвращает true если совпадает два токена и в базе есть юзер с паролем
     public function validateUserName($username, $password, $newtoken, $oldtoken){
       if ($oldtoken===$newtoken){
-        $pattern = '/^[\w\-\_\.]+$/'; //username can contain only letters, numbers, dots, -_
+        $pattern = '/^[\w\-\_\.@]+$/'; //username can contain only letters, numbers, dots, -_@
         if (!preg_match($pattern, $username)) return false;
-        $user = $this->findUser($username);
+        $user = $this->findUser($username, false);
+        //if ($user['deleted']===1 || $user['enabled']===0) return false;
         if (password_verify($password, $user['password'])) return true;
       }
       return false;
