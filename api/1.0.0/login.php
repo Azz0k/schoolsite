@@ -16,9 +16,8 @@ if ($method==='OPTIONS'){
 foreach (glob($_SERVER['DOCUMENT_ROOT'].'/includes/php/*.php') as $file){
   require_once $file;
 }
-
+$header = getallheaders();
 if ($method==="GET"){
-  $header = getallheaders();
   if (isset($header['Authorization']) && $header['Authorization']){ #тут надо запилить проверку jwt и перевыпуск токена
     list($bearer,$oldJwt) = explode(' ',$header['Authorization']);
     if ($bearer==='Bearer'){

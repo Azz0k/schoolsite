@@ -58,10 +58,14 @@ class Database
             $this->error($e, "Unable to query database: ");
             exit(0);
         }
-
         return $result;
     }
 
+    public function updateUsers($newUsers, $oldUsers) {
+      $result = false;
+
+      return $result;
+    }
     //новая функция для APi возвращает true если совпадает два токена и в базе есть юзер с паролем
     public function validateUserName($username, $password, $newtoken, $oldtoken){
       if ($oldtoken===$newtoken){

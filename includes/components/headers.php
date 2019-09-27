@@ -16,7 +16,7 @@ if ($method==='OPTIONS'){
 foreach (glob($_SERVER['DOCUMENT_ROOT'].'/includes/php/*.php') as $file){
   require_once $file;
 }
-if ($method !== "GET"){
+if ($method !== "GET" && $method !== "POST"){
   http_response_code(403);
   die();
 }
@@ -37,6 +37,5 @@ if ($bearer!=='Bearer'){
     http_response_code(401);
     die();
   }
-  http_response_code(200);
 
 
