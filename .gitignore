@@ -8,6 +8,7 @@ npm-debug.log
 yarn-error.log
 composer.json
 composer.lock
+vendor/
 
 # Editor directories and files
 .idea
