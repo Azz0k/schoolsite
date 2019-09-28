@@ -61,11 +61,17 @@ class Database
         return $result;
     }
 
-    public function updateUsers($newUsers) {
+    public function updateUsers($newUsers, $method = 'UPDATE') {
       $result = true;
+      $update = null;
       try{
         //$update = $this->pdo->prepare('UPDATE users SET firstname=:firstname lastname=:lastname email=:email description=:description username=:username canconfigure=:canconfigure canchangeusers=:canchangeusers canchangemenu=:canchangemenu canchangematerials=:canchangematerials deleted=:deleted enabled=:enabled WHERE id=:id');
-        $update = $this->pdo->prepare('UPDATE users SET userdate=:userdate, firstname=:firstname, lastname=:lastname, email=:email, description=:description, username=:username, canconfigure=:canconfigure, canchangeusers=:canchangeusers, canchangemenu=:canchangemenu, canchangematerials=:canchangematerials, deleted=:deleted, enabled=:enabled WHERE id=:id');
+        if ($method === 'UPDATE'){
+          $update = $this->pdo->prepare('UPDATE users SET userdate=:userdate, firstname=:firstname, lastname=:lastname, email=:email, description=:description, username=:username, canconfigure=:canconfigure, canchangeusers=:canchangeusers, canchangemenu=:canchangemenu, canchangematerials=:canchangematerials, deleted=:deleted, enabled=:enabled WHERE id=:id');
+        }
+        if ($method === 'ADD') {
+          $update = $this->pdo->prepare('INSERT INTO users SET userdate=:userdate, firstname=:firstname, lastname=:lastname, email=:email, description=:description, username=:username, canconfigure=:canconfigure, canchangeusers=:canchangeusers, canchangemenu=:canchangemenu, canchangematerials=:canchangematerials, deleted=:deleted, enabled=:enabled, id=:id');
+        }
         foreach ($newUsers as $newUser){
           $newUser["userdate"]=date ("Y-m-d H:i:s");
           $update->execute($newUser);
@@ -74,9 +80,11 @@ class Database
       catch (PDOException $e){
         $result=false;
       }
-
       return $result;
     }
+
+
+
     //новая функция для APi возвращает true если совпадает два токена и в базе есть юзер с паролем
     public function validateUserName($username, $password, $newtoken, $oldtoken){
       if ($oldtoken===$newtoken){

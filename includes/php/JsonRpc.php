@@ -31,11 +31,18 @@ class JsonRpc
     return json_encode($result);
   }
 
-  private function arrayToJson($arr, $id = null){
+  private function resultToJson($arr, $id = null){
     $result = ["jsonrpc" => "2.0", "result"=>$arr, "id" => $id];
     return json_encode($result);
   }
 
+  private function getAllUsers() {
+    $users = $this->database->findUser('', true);
+    for ($i=0;$i<count($users);$i++){
+      unset($users[$i]['password']);
+    }
+    return $users;
+  }
   public function getResponse() {
     if ($this->request["jsonrpc"]!=="2.0")
       return $this->errorToJson(-32700);
@@ -46,15 +53,15 @@ class JsonRpc
           if ($this->rights->Users === 0)
             return $this->errorToJson(-1);
           if ($method === "getAll"){
-            $users = $this->database->findUser('', true);
-            for ($i=0;$i<count($users);$i++){
-              unset($users[$i]['password']);
-            }
-            return $this->arrayToJson($users, "Users.getAll");
+            return $this->resultToJson($this->getAllUsers(), "Users.getAll");
           }
           if ($method === "update") {
-            if ($this->database->updateUsers($params)) return $this->arrayToJson(["result"=>"ok"]);
-            else $this->errorToJson(-32602);
+            $this->database->updateUsers($params);
+            return $this->resultToJson($this->getAllUsers(), "Users.update");
+          }
+          if ($method === "add") {
+            $this->database->updateUsers($params,'ADD');
+            return $this->resultToJson($this->getAllUsers(), "Users.update");
           }
         break;
       default:
