@@ -72,6 +72,9 @@ class Database
         if ($method === 'ADD') {
           $update = $this->pdo->prepare('INSERT INTO users SET userdate=:userdate, firstname=:firstname, lastname=:lastname, email=:email, description=:description, username=:username, canconfigure=:canconfigure, canchangeusers=:canchangeusers, canchangemenu=:canchangemenu, canchangematerials=:canchangematerials, deleted=:deleted, enabled=:enabled, id=:id');
         }
+        if ($method === 'PASSWORD'){
+          $update = $this->pdo->prepare('UPDATE users SET userdate=:userdate, password=:password WHERE id=:id');
+        }
         foreach ($newUsers as $newUser){
           $newUser["userdate"]=date ("Y-m-d H:i:s");
           $update->execute($newUser);
@@ -91,7 +94,7 @@ class Database
         $pattern = '/^[\w\-\_\.@]+$/'; //username can contain only letters, numbers, dots, -_@
         if (!preg_match($pattern, $username)) return false;
         $user = $this->findUser($username, false);
-        //if ($user['deleted']===1 || $user['enabled']===0) return false;
+        if ($user['deleted']===1 || $user['enabled']===0) return false;
         if (password_verify($password, $user['password'])) return true;
       }
       return false;

@@ -48,6 +48,7 @@ class JsonRpc
       return $this->errorToJson(-32700);
     list($category, $method) = explode('.', $this->request["method"]);
     $params = $this->request["params"];
+    $id = $this->request["id"];
     switch ($category){
       case 'Users':
           if ($this->rights->Users === 0)
@@ -62,6 +63,11 @@ class JsonRpc
           if ($method === "add") {
             $this->database->updateUsers($params,'ADD');
             return $this->resultToJson($this->getAllUsers(), "Users.update");
+          }
+          if ($method === "changePassword") {
+            $pass = array(array("id"=>$id,"password"=>password_hash($params, PASSWORD_DEFAULT)));
+            $this->database->updateUsers($pass,'PASSWORD');
+            return $this->resultToJson("ok", $id);
           }
         break;
       default:
