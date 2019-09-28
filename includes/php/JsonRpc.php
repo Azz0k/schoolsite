@@ -3,14 +3,14 @@
 
 class JsonRpc
 {
-  private $pdo;
+  private $database;
   private $rights;
   private $request;
 
-  public function __construct($request, $rights, $pdo) {
+  public function __construct($request, $rights, $database) {
     $this->request = $request;
     $this->rights = $rights;
-    $this->pdo = $pdo;
+    $this->database = $database;
   }
 
   private function errorToJson($error, $message='') {
@@ -31,7 +31,7 @@ class JsonRpc
     return json_encode($result);
   }
 
-  private function arrayToJson($arr, $id){
+  private function arrayToJson($arr, $id = null){
     $result = ["jsonrpc" => "2.0", "result"=>$arr, "id" => $id];
     return json_encode($result);
   }
@@ -40,18 +40,22 @@ class JsonRpc
     if ($this->request["jsonrpc"]!=="2.0")
       return $this->errorToJson(-32700);
     list($category, $method) = explode('.', $this->request["method"]);
+    $params = $this->request["params"];
     switch ($category){
       case 'Users':
           if ($this->rights->Users === 0)
             return $this->errorToJson(-1);
           if ($method === "getAll"){
-            $users = $this->pdo->findUser('', true);
+            $users = $this->database->findUser('', true);
             for ($i=0;$i<count($users);$i++){
               unset($users[$i]['password']);
             }
             return $this->arrayToJson($users, "Users.getAll");
           }
-
+          if ($method === "update") {
+            if ($this->database->updateUsers($params)) return $this->arrayToJson(["result"=>"ok"]);
+            else $this->errorToJson(-32602);
+          }
         break;
       default:
         return $this->errorToJson(-32601);

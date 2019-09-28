@@ -61,8 +61,19 @@ class Database
         return $result;
     }
 
-    public function updateUsers($newUsers, $oldUsers) {
-      $result = false;
+    public function updateUsers($newUsers) {
+      $result = true;
+      try{
+        //$update = $this->pdo->prepare('UPDATE users SET firstname=:firstname lastname=:lastname email=:email description=:description username=:username canconfigure=:canconfigure canchangeusers=:canchangeusers canchangemenu=:canchangemenu canchangematerials=:canchangematerials deleted=:deleted enabled=:enabled WHERE id=:id');
+        $update = $this->pdo->prepare('UPDATE users SET userdate=:userdate, firstname=:firstname, lastname=:lastname, email=:email, description=:description, username=:username, canconfigure=:canconfigure, canchangeusers=:canchangeusers, canchangemenu=:canchangemenu, canchangematerials=:canchangematerials, deleted=:deleted, enabled=:enabled WHERE id=:id');
+        foreach ($newUsers as $newUser){
+          $newUser["userdate"]=date ("Y-m-d H:i:s");
+          $update->execute($newUser);
+        }
+      }
+      catch (PDOException $e){
+        $result=false;
+      }
 
       return $result;
     }
