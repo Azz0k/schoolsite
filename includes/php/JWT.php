@@ -46,7 +46,7 @@ class JWT
           $time = $payload->canregen;
             if ($time > time()) return $jwt;
             else{
-              $instance = new self(self::$rights['username'], $secret);
+              $instance = new self(self::$rights->username, $secret);
               return $instance->regenerate($immutablePayload);
             }
 
